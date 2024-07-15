@@ -1,0 +1,25 @@
+{
+    "files.associations": {
+        "array": "cpp",
+        "charconv": "cpp",
+        "complex": "cpp",
+        "functional": "cpp",
+        "ranges": "cpp",
+        "ratio": "cpp",
+        "tuple": "cpp",
+        "type_traits": "cpp",
+        "variant": "cpp",
+        "utility": "cpp",
+        "compare": "cpp",
+        "vector": "cpp",
+        "__hash_table": "cpp",
+        "__tree": "cpp",
+        "forward_list": "cpp",
+        "limits": "cpp",
+        "chrono": "cpp",
+        "istream": "cpp",
+        "memory_resource": "cpp",
+        "ostream": "cpp",
+        "algorithm": "cpp"
+    }
+}
