@@ -6,11 +6,11 @@
 #include <rope.h>
 
 #define RANDOM_MAX 10
-#define SEED 108122231234
+#define SEED 32
 
-#define MODE 0
-#define INPUT_LOG 1
-#define ROPE_LOG 1
+#define MODE 1
+#define INPUT_LOG 0
+#define ROPE_LOG 0
 #define CMP_LOG 1
 
 #define D 4096
@@ -28,7 +28,7 @@ int main() {
                 Token[i][j] = i*VL + j;
             }
         }
-        int m_pos = 10;//(int)(rand() % RANDOM_MAX);
+        int m_pos = (int)(rand() % RANDOM_MAX);
     #endif
     #if MODE == 1
         float Token[D/VL][VL];
