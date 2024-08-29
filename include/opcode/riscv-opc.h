@@ -3031,6 +3031,29 @@
 #define MASK_SF_VC_FVW 0xfa00707f
 #define MATCH_SF_VC_V_FVW 0xf800505b
 #define MASK_SF_VC_V_FVW 0xfa00707f
+
+/* Custom Instruction Section */
+/* RV_V */
+// Vector MOD
+#define MATCH_VMOD_VI 0x4003057
+#define MASK_VMOD_VI 0xfc00707f
+
+#define MATCH_VMOD_VV 0xc000057
+#define MASK_VMOD_VV 0xfc00707f
+
+#define MATCH_VMOD_VX 0x20004057
+#define MASK_VMOD_VX 0xfc00707f
+
+//Sinusoidal positional encoding
+#define MATCH_VFSINPE_VV 0x54001057
+#define MASK_VFSINPE_VV 0xfc00707f
+
+//RoPE
+#define MATCH_VFROPE_VF 0x44005057
+#define MASK_VFROPE_VF 0xfc00707f
+
+/* Custom Instruction Section */
+
 /* Unprivileged Counter/Timers CSR addresses.  */
 #define CSR_CYCLE 0xc00
 #define CSR_TIME 0xc01
@@ -4037,6 +4060,22 @@ DECLARE_INSN(th_sync_s, MATCH_TH_SYNC_S, MASK_TH_SYNC_S)
 /* XVentanaCondOps instructions. */
 DECLARE_INSN(vt_maskc, MATCH_VT_MASKC, MASK_VT_MASKC)
 DECLARE_INSN(vt_maskcn, MATCH_VT_MASKCN, MASK_VT_MASKCN)
+
+/* Custom Instruction Section */
+/* RV_V */
+// Vector MOD
+DECLARE_INSN(vmod_vi, MATCH_VMOD_VI, MASK_VMOD_VI)
+DECLARE_INSN(vmod_vv, MATCH_VMOD_VV, MASK_VMOD_VV)
+DECLARE_INSN(vmod_vx, MATCH_VMOD_VX, MASK_VMOD_VX)
+
+// Sinusoidal positional encoding
+DECLARE_INSN(vfsinpe_vv, MATCH_VFSINPE_VV, MASK_VFSINPE_VV)
+
+//RoPE
+DECLARE_INSN(vfrope_vf, MATCH_VFROPE_VF, MASK_VFROPE_VF)
+
+/* Custom Instruction Section */
+
 #endif /* DECLARE_INSN */
 #ifdef DECLARE_CSR
 /* Unprivileged Counter/Timers CSRs.  */

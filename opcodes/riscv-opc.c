@@ -347,6 +347,20 @@ const struct riscv_opcode riscv_opcodes[] =
 {
 /* name, xlen, isa, operands, match, mask, match_func, pinfo.  */
 
+/* Custom Instruction Section*/
+/* RV_V */
+// Vector MOD
+{"vmod.vv",    0, INSN_CLASS_V,  "Vd,Vt,VsVm", MATCH_VMOD_VV, MASK_VMOD_VV, match_opcode, 0 },
+{"vmod.vx",    0, INSN_CLASS_V,  "Vd,Vt,sVm", MATCH_VMOD_VX, MASK_VMOD_VX, match_opcode, 0 },
+{"vmod.vi",    0, INSN_CLASS_V,  "Vd,Vt,ViVm", MATCH_VMOD_VI, MASK_VMOD_VI, match_opcode, 0 },
+
+// Sinusoidal positional encoding
+{"vfsinpe.vv",   0, INSN_CLASS_ZVEF, "Vd,Vt,VsVm", MATCH_VFSINPE_VV, MASK_VFSINPE_VV, match_opcode, 0},
+
+//RoPE
+{"vfrope.vf",   0, INSN_CLASS_ZVEF, "Vd,Vt,SVm", MATCH_VFROPE_VF, MASK_VFROPE_VF, match_opcode, 0},
+/* Custom Instruction Section*/
+
 /* Standard hints.  */
 {"prefetch.i",  0, INSN_CLASS_ZICBOP, "Wif(s)", MATCH_PREFETCH_I, MASK_PREFETCH_I, match_opcode, 0 },
 {"prefetch.r",  0, INSN_CLASS_ZICBOP, "Wif(s)", MATCH_PREFETCH_R, MASK_PREFETCH_R, match_opcode, 0 },
