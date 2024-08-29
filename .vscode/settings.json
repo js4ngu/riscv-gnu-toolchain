@@ -20,6 +20,23 @@
         "istream": "cpp",
         "memory_resource": "cpp",
         "ostream": "cpp",
-        "algorithm": "cpp"
+        "algorithm": "cpp",
+        "riscv_vector.h": "c",
+        "stdint.h": "c",
+        "*.inc": "c",
+        "random": "c",
+        "typeinfo": "cpp",
+        "ios": "cpp",
+        "stdfloat": "cpp",
+        "platform.h": "c",
+        "cstdint": "c",
+        "format": "c",
+        "executor": "cpp",
+        "__locale": "cpp",
+        "stdbool.h": "c",
+        "bitset": "c",
+        "*.tcc": "cpp",
+        "buffer": "cpp",
+        "softfloat.h": "c"
     }
 }
