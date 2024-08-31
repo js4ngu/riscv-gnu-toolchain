@@ -164,9 +164,6 @@ int main() {
     printf("\nOPFVV Example : vfadd.vv\n");
     example_opfvv();
 
-    //printf("\nOPMVV Example : vmv.v.v\n");
-    //example_opmvv();
-
     printf("\nOPIVI Example : vadd.vi\n");
     example_opivi();
 
@@ -176,8 +173,6 @@ int main() {
     printf("\nOPFVF Example : vfadd.vf\n");
     example_opfvf();
 
-    //printf("\nOPMVX Example : vmv.v.x\n");
-    //example_opmvx();
-
     return 0;
 }
+
