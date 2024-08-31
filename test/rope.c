@@ -17,7 +17,8 @@ void ASM_VFROPE_FP32(float *token, float *new_token, int VL, float theta, int m_
     );
 }
 
-void SIMD_VFROPE_FP32(float *Token, float *New_Token, int VL, float theta, int m_pos, int D) {
+void SIMD_VFROPE_FP32(float *Token, float *New_Token, int VL, int m_pos, int D) {
+    float theta = (2 * M_PI ) / D;
     int base_index = 0;
     for (int i = 0; i < D / VL; i++) {
         ASM_VFROPE_FP32(&Token[i * VL], &New_Token[i * VL], VL, theta, m_pos, base_index);

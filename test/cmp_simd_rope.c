@@ -18,9 +18,7 @@ int main() {
 
     float New_Token[D];
     float New_Token_baseline[D];
-    float theta = (2 * M_PI ) / D;
-
-    SIMD_VFROPE_FP32(&Token[0][0], New_Token, VL, theta, m_pos, D);
+    SIMD_VFROPE_FP32(&Token[0][0], New_Token, VL, m_pos, D);
 
     return 0;
 }

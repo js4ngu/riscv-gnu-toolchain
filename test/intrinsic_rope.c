@@ -8,7 +8,7 @@
 #define RANDOM_MAX 10
 #define SEED 32
 
-#define MODE 1
+#define MODE 0
 #define INPUT_LOG 0
 #define ROPE_LOG 0
 #define CMP_LOG 1
@@ -42,10 +42,9 @@ int main() {
 
     float New_Token[D];
     float New_Token_baseline[D];
-    float theta = (2 * M_PI ) / D;
 
     SCALAR_ROPE_FP32(&Token[0][0], m_pos, New_Token_baseline, D);
-    SIMD_VFROPE_FP32(&Token[0][0], New_Token, VL, theta, m_pos, D);
+    SIMD_VFROPE_FP32(&Token[0][0], New_Token, VL, m_pos, D);
     debug_rope(Token, New_Token_baseline, New_Token);
 
     return 0;

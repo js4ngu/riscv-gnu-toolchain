@@ -15,12 +15,10 @@ int main() {
             Token[i][j] = i*VL + j;
         }
     }
-    int m_pos = 10;
+    int m_pos = 457;
 
     float New_Token[D];
     float New_Token_baseline[D];
-    float theta = (2 * M_PI ) / D;
-
     SCALAR_ROPE_FP32(&Token[0][0], m_pos, New_Token_baseline, D);
 
     return 0;
