@@ -359,6 +359,10 @@ const struct riscv_opcode riscv_opcodes[] =
 
 //RoPE
 {"vfrope.vf",   0, INSN_CLASS_ZVEF, "Vd,Vt,SVm", MATCH_VFROPE_VF, MASK_VFROPE_VF, match_opcode, 0},
+
+//RoPE
+{"vfrope.fvx",   0, INSN_CLASS_ZVEF, "Vd,Vt,sVm", MATCH_VFROPE_FVX, MASK_VFROPE_FVX, match_opcode, 0},
+
 /* Custom Instruction Section*/
 
 /* Standard hints.  */

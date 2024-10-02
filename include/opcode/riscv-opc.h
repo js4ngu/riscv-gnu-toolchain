@@ -3052,6 +3052,10 @@
 #define MATCH_VFROPE_VF 0x44005057
 #define MASK_VFROPE_VF 0xfc00707f
 
+// RoPE.FVX
+#define MATCH_VFROPE_FVX 0x48005057
+#define MASK_VFROPE_FVX 0xfc00707f
+
 /* Custom Instruction Section */
 
 /* Unprivileged Counter/Timers CSR addresses.  */
@@ -4073,6 +4077,9 @@ DECLARE_INSN(vfsinpe_vv, MATCH_VFSINPE_VV, MASK_VFSINPE_VV)
 
 //RoPE
 DECLARE_INSN(vfrope_vf, MATCH_VFROPE_VF, MASK_VFROPE_VF)
+
+//RoPE.FVX
+DECLARE_INSN(vfrope_fvx, MATCH_VFROPE_FVX, MASK_VFROPE_FVX)
 
 /* Custom Instruction Section */
 
