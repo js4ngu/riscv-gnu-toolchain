@@ -1,0 +1,7 @@
+{
+    "files.associations": {
+        "/home/gem5/src/arch/riscv/isa/formats/vector_arith.isa": "cpp",
+        "*.isa": "cpp",
+        "stdint.h": "c"
+    }
+}

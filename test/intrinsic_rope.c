@@ -44,7 +44,9 @@ int main() {
     float New_Token_baseline[D];
 
     SCALAR_ROPE_FP32(&Token[0][0], m_pos, New_Token_baseline, D);
-    SIMD_VFROPE_FP32(&Token[0][0], New_Token, VL, m_pos, D);
+    //SIMD_VFROPE_FP32(&Token[0][0], New_Token, VL, m_pos, D);
+    SIMD_VFROPE_FVX_FP32(&Token[0][0], New_Token, VL, m_pos, D);
+
     debug_rope(Token, New_Token_baseline, New_Token);
 
     return 0;

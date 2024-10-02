@@ -1,4 +1,6 @@
 #include <stdio.h>
+#include <rope.h>
+
 #define VECTOR_SIZE 4
 
 void main() {
@@ -9,19 +11,8 @@ void main() {
     int baseIndex = 0;
     int m_pos = 10;
 
-    asm volatile (
-        "fmv.s f30, %5\n\t"  // Changed fa30 to f30
-        "mv x31, %4\n\t"     // Set M using the variable
-        "vsetvli t0, %2, e32, m1\n"
-        "vle32.v v0, (%1)\n"
-        "vfrope.fvx v2, v0, %0\n"
-        "vse32.v v2, (%3)\n"
-        : 
-        : "r" (baseIndex), "r" (Token), "r" (VECTOR_SIZE), "r" (newToken), "r" (m_pos), "f" (theta)
-        : "t0", "v0", "v1", "v2", "x31", "f30"
-    );
+    SIMD_VFROPE_FVX_FP32(&Token[0], newToken, VECTOR_SIZE, m_pos, VECTOR_SIZE);
 
-    // Print the result
     for (int i = 0; i < VECTOR_SIZE; i++) {
         printf("result[%d] = %f\n", i, newToken[i]);
     }
