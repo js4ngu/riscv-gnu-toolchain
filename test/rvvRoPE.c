@@ -2,8 +2,8 @@
 #include <math.h>
 #include <rope.h>
 
-#define D 8
-#define VL 4
+#define D 16
+#define VL 8
 
 void main() {
     // Define two vectors of 32-bit floating point numbers
@@ -15,7 +15,7 @@ void main() {
         }
     }
 
-    int m_pos = 5;
+    int m_pos = 4;
     RVV_ROPE_FP32(&Token[0][0], New_Token, VL, m_pos, D);
     printf("\n========================================\n");
     for (int i = 0; i < D; i++) {

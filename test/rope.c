@@ -3,6 +3,8 @@
 #include <math.h>
 #include <stdint.h>  // uint32_t 정의를 위해 추가
 
+#define DEBUG 0
+
 void ASM_VFROPE_FP32(float *token, float *new_token, int VL, float theta, int m_pos, int base_index) {
     asm volatile (
         "mv x30, %5\n\t"                     // set Base Index
@@ -79,7 +81,6 @@ void SIMD_VFROPE_FVX_FP32(float *Token, float *New_Token, int VL, int m_pos, int
 }
 
 void ASM_RVV_ROPE_FP32(float *cosX, float *sinX, int VL, uint32_t *evenMask, uint32_t *oddMask, float *New_Token) {
-    // Temporary arrays to store intermediate vector register values
     float v1_result[VL] __attribute__((aligned(16)));
     float v2_result[VL] __attribute__((aligned(16)));
     float v5_result[VL] __attribute__((aligned(16)));
@@ -97,7 +98,7 @@ void ASM_RVV_ROPE_FP32(float *cosX, float *sinX, int VL, uint32_t *evenMask, uin
         "vse32.v v2, (%7)\n\t"                // Save v2 result
 
         // Even index processing: v5 = cosX - (slide down sinX)
-        "vle32.v v3, (%3)\n\t"                // Load evenMask into v3
+        "vle32.v v3, (%4)\n\t"                // Load evenMask(1010) into v3
         "vslidedown.vi v8, v2, 1\n\t"         // Slide down sinX by 1 position
         "vmand.mm v0, v3, v3\n\t"             // Mask even positions
         "vfsub.vv v5, v1, v8, v0.t\n\t"       // Perform: v5 = cosX - (slidedown sinX)
@@ -106,7 +107,7 @@ void ASM_RVV_ROPE_FP32(float *cosX, float *sinX, int VL, uint32_t *evenMask, uin
         "vse32.v v5, (%8)\n\t"                // Save v5 result
 
         // Odd index processing: v6 = cosX + (slide up sinX)
-        "vle32.v v4, (%4)\n\t"                // Load oddMask into v4
+        "vle32.v v4, (%3)\n\t"                // Load oddMask(0101) into v4
         "vslideup.vi v9, v2, 1\n\t"           // Slide up sinX by 1 position
         "vmand.mm v0, v4, v4\n\t"             // Mask odd positions
         "vfadd.vv v6, v1, v9, v0.t\n\t"       // Perform: v6 = cosX + (slideup sinX)
@@ -125,33 +126,33 @@ void ASM_RVV_ROPE_FP32(float *cosX, float *sinX, int VL, uint32_t *evenMask, uin
           "r" (v1_result), "r" (v2_result), "r" (v5_result), "r" (v6_result)
         : "t0", "v0", "v1", "v2", "v3", "v4", "v5", "v6", "v7", "v8", "v9"
     );
-
-    // Print intermediate results inside the function
-    printf("\n\ncosX : ");
-    for (int j = 0; j < VL; j++) {
-        printf("%f ", v1_result[j]);
-    }
-    printf("\nsinX : ");
-    for (int j = 0; j < VL; j++) {
-        printf("%f ", v2_result[j]);
-    }
-    printf("\n\ncosX - (slide down sinX) : ");
-    for (int j = 0; j < VL; j++) {
-        printf("%f ", v5_result[j]);
-    }
-    printf("\ncosX + (slide up sinX) : ");
-    for (int j = 0; j < VL; j++) {
-        printf("%f ", v6_result[j]);
-    }
-    printf("\n\nnewToken : ");
-    for (int j = 0; j < VL; j++) {
-        printf("%f ", New_Token[j]);
-    }
-    printf("\n------------------------------------------------------\n");
+    #if DEBUG == 1 
+        printf("\n\ncosX : ");
+        for (int j = 0; j < VL; j++) {
+            printf("%f ", v1_result[j]);
+        }
+        printf("\nsinX : ");
+        for (int j = 0; j < VL; j++) {
+            printf("%f ", v2_result[j]);
+        }
+        printf("\n\ncosX - (slide down sinX) : ");
+        for (int j = 0; j < VL; j++) {
+            printf("%f ", v5_result[j]);
+        }
+        printf("\ncosX + (slide up sinX) : ");
+        for (int j = 0; j < VL; j++) {
+            printf("%f ", v6_result[j]);
+        }
+        printf("\n\nnewToken : ");
+        for (int j = 0; j < VL; j++) {
+            printf("%f ", New_Token[j]);
+        }
+        printf("\n------------------------------------------------------\n");
+    #endif
 }
 
-/*
 void RVV_ROPE_FP32(float *Token, float *New_Token, int VL, int m_pos, int D) {
+    // Temporary arrays to store intermediate results
     volatile float cosX[VL] __attribute__((aligned(16)));
     volatile float sinX[VL] __attribute__((aligned(16)));
 
@@ -163,54 +164,22 @@ void RVV_ROPE_FP32(float *Token, float *New_Token, int VL, int m_pos, int D) {
     float m_theta_i;
     int base_index = 0;
 
-    for (int i = 0; i < D; i += 2) {
-        int factor = (i / 2) + 1;
-        m_theta_i = m_pos * theta * factor * M_PI;
+    for (int block = 0; block < D / VL; block ++) {
+        for (int i = 0; i < VL; i += 2) {
+            int factor = (i / 2) + 1;
+            m_theta_i = m_pos * theta * factor * M_PI + ((m_pos * theta * M_PI) * (VL/2) * block);
 
-        cosX[i]     = Token[i]     * cosf(m_theta_i);
-        cosX[i + 1] = Token[i + 1] * cosf(m_theta_i);
-        sinX[i]     = Token[i]     * sinf(m_theta_i);
-        sinX[i + 1] = Token[i + 1] * sinf(m_theta_i);
-    }
-
-    ASM_RVV_ROPE_FP32((float *)cosX, (float *)sinX, VL, &evenMask, &oddMask, New_Token);
-}
-*/
-// -1  3 -2 -3  5 -4   6  7
-
-void RVV_ROPE_FP32(float *Token, float *New_Token, int VL, int m_pos, int D) {
-    volatile float cosX[VL] __attribute__((aligned(16)));
-    volatile float sinX[VL] __attribute__((aligned(16)));
-
-    // Mask constants
-    uint32_t evenMask = 0xAAAAAAAA;
-    uint32_t oddMask  = 0x55555555;
-    int token_base_index = 0;
-
-    float theta = 2.0f / D;
-    float m_theta_i;
-    for (int i = 0; i < D/VL; i++) {
-        for (int j = 0; j < VL; j += 2) {
-            int factor = ((j + token_base_index) / 2) + 1;
-            m_theta_i = m_pos * theta *  M_PI * factor;
-
-            cosX[j]     = Token[token_base_index + j]     * cosf(m_theta_i);
-            cosX[j + 1] = Token[token_base_index + j + 1] * cosf(m_theta_i);
-            sinX[j]     = Token[token_base_index + j]     * sinf(m_theta_i);
-            sinX[j + 1] = Token[token_base_index + j + 1] * sinf(m_theta_i);
-        } //feed well
-        /*
-        for (int j = 0; j < VL; j++) {
-            printf("Token,cosX[%d] :%f, %f\n", j, Token[token_base_index + j], cosX[j]);
+            cosX[i]     = Token[(block * VL) + i]     * cosf(m_theta_i);
+            cosX[i + 1] = Token[(block * VL) + i + 1] * cosf(m_theta_i);
+            sinX[i]     = Token[(block * VL) + i]     * sinf(m_theta_i);
+            sinX[i + 1] = Token[(block * VL) + i + 1] * sinf(m_theta_i);
+            #if DEBUG == 1 
+                printf("\nblock : %d \tm_theta_i = %f \n", block, m_theta_i/M_PI);
+                printf("[%f Pi]\tcosX : %f x %f = %f\t sinX : %f x %f = %f\n",m_theta_i/M_PI, Token[(block * VL) + i], cosf(m_theta_i), cosX[i], Token[(block * VL) + i], sinf(m_theta_i), sinX[i]);
+                printf("[%f Pi]\tcosX : %f x %f = %f\t sinX : %f x %f = %f\n",m_theta_i/M_PI, Token[(block * VL) + i + 1], cosf(m_theta_i), cosX[i + 1], Token[(block * VL) + i + 1], sinf(m_theta_i), sinX[i + 1]);
+            #endif
         }
-        printf("\n");
-        for (int j = 0; j < VL; j++) {
-            printf("Token,sinX[%d] :%f, %f\n", j, Token[token_base_index + j], sinX[j]);
-        }
-        printf("\n\n");
-        */
-        ASM_RVV_ROPE_FP32((float *)cosX, (float *)sinX, VL, &evenMask, &oddMask, &New_Token[i*VL]);
-        token_base_index = token_base_index + VL;
+
+        ASM_RVV_ROPE_FP32((float *)cosX, (float *)sinX, VL, &evenMask, &oddMask, New_Token + (block * VL));
     }
 }
-

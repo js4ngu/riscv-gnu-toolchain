@@ -4,7 +4,7 @@
 #include <stdio.h>
 #include <rope.h>
 
-#define D 8
+#define D 16
 #define VL 4
 
 
@@ -15,7 +15,7 @@ int main() {
             Token[i][j] = i*VL + j;
         }
     }
-    int m_pos = 457;
+    int m_pos = 4;
 
     float New_Token[D];
     float New_Token_baseline[D];
