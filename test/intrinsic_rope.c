@@ -6,8 +6,8 @@
 #include <rope.h>
 
 #define USE_SIMD_VFROPE_FP32 0 
-#define USE_SIMD_VFROPE_FVX_FP32 0 
-#define USE_RVV_ROPE_FP32 1
+#define USE_SIMD_VFROPE_FVX_FP32 1
+#define USE_RVV_ROPE_FP32 0
 
 #define RANDOM_MAX 10
 #define SEED 32
@@ -18,7 +18,7 @@
 #define CMP_LOG 1
 
 #define D 4096
-#define VL 16
+#define VL 8
 
 void debug_rope(float Token[][VL], float *New_Token_baseline, float *New_Token);
 

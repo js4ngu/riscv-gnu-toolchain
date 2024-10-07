@@ -126,29 +126,6 @@ void ASM_RVV_ROPE_FP32(float *cosX, float *sinX, int VL, uint32_t *evenMask, uin
           "r" (v1_result), "r" (v2_result), "r" (v5_result), "r" (v6_result)
         : "t0", "v0", "v1", "v2", "v3", "v4", "v5", "v6", "v7", "v8", "v9"
     );
-    #if DEBUG == 1 
-        printf("\n\ncosX : ");
-        for (int j = 0; j < VL; j++) {
-            printf("%f ", v1_result[j]);
-        }
-        printf("\nsinX : ");
-        for (int j = 0; j < VL; j++) {
-            printf("%f ", v2_result[j]);
-        }
-        printf("\n\ncosX - (slide down sinX) : ");
-        for (int j = 0; j < VL; j++) {
-            printf("%f ", v5_result[j]);
-        }
-        printf("\ncosX + (slide up sinX) : ");
-        for (int j = 0; j < VL; j++) {
-            printf("%f ", v6_result[j]);
-        }
-        printf("\n\nnewToken : ");
-        for (int j = 0; j < VL; j++) {
-            printf("%f ", New_Token[j]);
-        }
-        printf("\n------------------------------------------------------\n");
-    #endif
 }
 
 void RVV_ROPE_FP32(float *Token, float *New_Token, int VL, int m_pos, int D) {
@@ -173,13 +150,7 @@ void RVV_ROPE_FP32(float *Token, float *New_Token, int VL, int m_pos, int D) {
             cosX[i + 1] = Token[(block * VL) + i + 1] * cosf(m_theta_i);
             sinX[i]     = Token[(block * VL) + i]     * sinf(m_theta_i);
             sinX[i + 1] = Token[(block * VL) + i + 1] * sinf(m_theta_i);
-            #if DEBUG == 1 
-                printf("\nblock : %d \tm_theta_i = %f \n", block, m_theta_i/M_PI);
-                printf("[%f Pi]\tcosX : %f x %f = %f\t sinX : %f x %f = %f\n",m_theta_i/M_PI, Token[(block * VL) + i], cosf(m_theta_i), cosX[i], Token[(block * VL) + i], sinf(m_theta_i), sinX[i]);
-                printf("[%f Pi]\tcosX : %f x %f = %f\t sinX : %f x %f = %f\n",m_theta_i/M_PI, Token[(block * VL) + i + 1], cosf(m_theta_i), cosX[i + 1], Token[(block * VL) + i + 1], sinf(m_theta_i), sinX[i + 1]);
-            #endif
+            ASM_RVV_ROPE_FP32((float *)cosX, (float *)sinX, VL, &evenMask, &oddMask, New_Token + (block * VL));
         }
-
-        ASM_RVV_ROPE_FP32((float *)cosX, (float *)sinX, VL, &evenMask, &oddMask, New_Token + (block * VL));
     }
 }
