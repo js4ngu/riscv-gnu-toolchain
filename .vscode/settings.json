@@ -1,5 +1,7 @@
 {
     "files.associations": {
+        "*.isa": "cpp",
+        "/home/gem5/src/arch/riscv/isa/formats/vector_arith.isa": "cpp",
         "array": "cpp",
         "charconv": "cpp",
         "complex": "cpp",
@@ -37,6 +39,17 @@
         "bitset": "c",
         "*.tcc": "cpp",
         "buffer": "cpp",
-        "softfloat.h": "c"
+        "softfloat.h": "c",
+        "stdlib.h": "c",
+        "*.x": "cpp",
+        "locale": "cpp",
+        "future": "cpp",
+        "system_error": "cpp",
+        "regex": "cpp",
+        "math.h": "c",
+        "stdio.h": "c",
+        "list": "c",
+        "scoped_allocator": "c",
+        "map": "c"
     }
 }

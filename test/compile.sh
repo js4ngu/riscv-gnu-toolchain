@@ -19,10 +19,11 @@ OUTPUT_FILE="${SOURCE_FILE%.*}.riscv"
 cd /home/jongsang/riscv-gnu-toolchain/test || exit 1
 
 # Remove the old output file if it exists
-rm -f "$OUTPUT_FILE"
+rm -f "$OUTPUT_FILE"ss
 
 # Compile the source file with gcc, enabling vector extension and linking the math library
 #riscv64-unknown-elf-gcc -march=rv64gcv -mabi=lp64d -O2 "$SOURCE_FILE" -o "$OUTPUT_FILE" -lm
+
 riscv64-unknown-elf-gcc -march=rv64gcv -mabi=lp64d -O2 -I. "$SOURCE_FILE" rope.c -o "$OUTPUT_FILE" -lm
 
 # Print message after compilation is done
