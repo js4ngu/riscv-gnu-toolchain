@@ -80,22 +80,18 @@ void SIMD_VFROPE_FVX_FP32(float *Token, float *New_Token, int VL, int m_pos, int
     }
 }
 
-void ASM_RVV_ROPE_FP32(float *cosX, float *sinX, int VL, uint32_t *evenMask, uint32_t *oddMask, float *New_Token) {
-    float v1_result[VL] __attribute__((aligned(16)));
-    float v2_result[VL] __attribute__((aligned(16)));
-    float v5_result[VL] __attribute__((aligned(16)));
-    float v6_result[VL] __attribute__((aligned(16)));
-
+void ASM_RVV_ROPE_FP32(float *cosX, float *sinX, int VL, uint32_t *evenMask, uint32_t *oddMask, float *Token, float *New_Token) {
     asm volatile (
         "vsetvli t0, %0, e32, m1\n\t"         // Set vector length and type
 
         // Load cosX and sinX
-        "vle32.v v1, (%1)\n\t"                // Load cosX into v1
-        "vle32.v v2, (%2)\n\t"                // Load sinX into v2
+        "vle32.v v1, (%1)\n\t"                // Load  cosX into v1
+        "vle32.v v2, (%2)\n\t"                // Load  sinX into v2
+        "vle32.v v10,(%6)\n\t"                // Load Token into v10
 
-        // Save intermediate v1 and v2 to memory
-        "vse32.v v1, (%6)\n\t"                // Save v1 result
-        "vse32.v v2, (%7)\n\t"                // Save v2 result
+        // 기존의 cos2X, sinX2를 vfmul을 이용하여 계산
+        //"vfmul.vv v1, v1, v10\n\t"            // v1 = cosX * Token
+        //"vfmul.vv v2, v2, v10\n\t"            // v2 = sinX * Token
 
         // Even index processing: v5 = cosX - (slide down sinX)
         "vle32.v v3, (%4)\n\t"                // Load evenMask(1010) into v3
@@ -103,17 +99,11 @@ void ASM_RVV_ROPE_FP32(float *cosX, float *sinX, int VL, uint32_t *evenMask, uin
         "vmand.mm v0, v3, v3\n\t"             // Mask even positions
         "vfsub.vv v5, v1, v8, v0.t\n\t"       // Perform: v5 = cosX - (slidedown sinX)
 
-        // Save intermediate v5 to memory
-        "vse32.v v5, (%8)\n\t"                // Save v5 result
-
         // Odd index processing: v6 = cosX + (slide up sinX)
         "vle32.v v4, (%3)\n\t"                // Load oddMask(0101) into v4
         "vslideup.vi v9, v2, 1\n\t"           // Slide up sinX by 1 position
         "vmand.mm v0, v4, v4\n\t"             // Mask odd positions
         "vfadd.vv v6, v1, v9, v0.t\n\t"       // Perform: v6 = cosX + (slideup sinX)
-
-        // Save intermediate v6 to memory
-        "vse32.v v6, (%9)\n\t"                // Save v6 result
 
         // Combine both results: v7 = v5 OR v6
         "vor.vv v7, v5, v6\n\t"               // Combine: v7 = v5 | v6
@@ -122,9 +112,8 @@ void ASM_RVV_ROPE_FP32(float *cosX, float *sinX, int VL, uint32_t *evenMask, uin
         "vse32.v v7, (%5)\n\t"                // Store the final result (v7)
         "fence\n\t"
         :
-        : "r" (VL), "r" (cosX), "r" (sinX), "r" (evenMask), "r" (oddMask), "r" (New_Token), 
-          "r" (v1_result), "r" (v2_result), "r" (v5_result), "r" (v6_result)
-        : "t0", "v0", "v1", "v2", "v3", "v4", "v5", "v6", "v7", "v8", "v9"
+        : "r" (VL), "r" (cosX), "r" (sinX), "r" (evenMask), "r" (oddMask), "r" (New_Token), "r" (Token)
+        : "t0", "v0", "v1", "v2", "v3", "v4", "v5", "v6", "v7", "v8", "v9", "v10"
     );
 }
 
@@ -132,25 +121,30 @@ void RVV_ROPE_FP32(float *Token, float *New_Token, int VL, int m_pos, int D) {
     // Temporary arrays to store intermediate results
     volatile float cosX[VL] __attribute__((aligned(16)));
     volatile float sinX[VL] __attribute__((aligned(16)));
+    volatile float cosX2[VL] __attribute__((aligned(16)));
+    volatile float sinX2[VL] __attribute__((aligned(16)));
 
     // Mask constants
     uint32_t evenMask = 0xAAAAAAAA;
     uint32_t oddMask  = 0x55555555;
     
     float theta = 2.0f / D;
+    float factor = 0;
     float m_theta_i;
     int base_index = 0;
 
     for (int block = 0; block < D / VL; block ++) {
         for (int i = 0; i < VL; i += 2) {
-            int factor = (i / 2) + 1;
-            m_theta_i = m_pos * theta * factor * M_PI + ((m_pos * theta * M_PI) * (VL/2) * block);
+            base_index    = (i / 2) + 1;
+            factor    = m_pos * theta * M_PI;
+            m_theta_i = factor * (base_index + (VL/2) * block);
 
             cosX[i]     = Token[(block * VL) + i]     * cosf(m_theta_i);
             cosX[i + 1] = Token[(block * VL) + i + 1] * cosf(m_theta_i);
             sinX[i]     = Token[(block * VL) + i]     * sinf(m_theta_i);
             sinX[i + 1] = Token[(block * VL) + i + 1] * sinf(m_theta_i);
-            ASM_RVV_ROPE_FP32((float *)cosX, (float *)sinX, VL, &evenMask, &oddMask, New_Token + (block * VL));
         }
+        
+        ASM_RVV_ROPE_FP32((float *)cosX, (float *)sinX, VL, &evenMask, &oddMask, Token + (block * VL), New_Token + (block * VL));
     }
 }
