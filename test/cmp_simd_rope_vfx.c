@@ -5,7 +5,7 @@
 #include <rope.h>
 
 #define D 4096
-#define VL 8
+#define VL 16
 
 int main() {
     float Token[D/VL][VL];

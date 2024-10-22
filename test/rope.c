@@ -189,7 +189,7 @@ void NEW_RVV_ROPE_FP32(float *Token, float *New_Token, int VL, int m_pos, int D)
     volatile float cosX[VL] __attribute__((aligned(16)));
     volatile float sinX[VL] __attribute__((aligned(16)));
 
-    // Mask constants
+    // Mask constants5
     uint32_t evenMask = 0xAAAAAAAA;
     uint32_t oddMask  = 0x55555555;
 
@@ -198,19 +198,14 @@ void NEW_RVV_ROPE_FP32(float *Token, float *New_Token, int VL, int m_pos, int D)
     float m_theta_i;
     int base_index = 0;
 
-    // Loop over the number of blocks
     for (int block = 0; block < D / VL; block++) {
-        // Calculate cosX and sinX for each element in the block
-        for (int i = 0; i < VL; i += 2) {
+        for (int i = 0; i < VL; i ++) {
             base_index = (i / 2) + 1;
             factor = m_pos * theta * M_PI;
             m_theta_i = factor * (base_index + (VL / 2) * block);
 
-            // Only calculate the trigonometric values here
             cosX[i]     = cosf(m_theta_i);             
-            cosX[i + 1] = cosf(m_theta_i);            
             sinX[i]     = sinf(m_theta_i);            
-            sinX[i + 1] = sinf(m_theta_i);
             // Check for NaN
             if (isnan(cosX[i]) || isnan(sinX[i]));
         }

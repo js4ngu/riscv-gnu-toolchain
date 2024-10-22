@@ -16,7 +16,7 @@ int main() {
     }
 
     int m_pos = 457;
-    RVV_ROPE_FP32(&Token[0][0], New_Token, VL, m_pos, D);
+    NEW_RVV_ROPE_FP32(&Token[0][0], New_Token, VL, m_pos, D);
     //printf("FIN\n");
     return 0;  // 명시적으로 0 반환
 }

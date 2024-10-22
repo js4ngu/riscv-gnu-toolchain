@@ -17,7 +17,7 @@
 #define ROPE_LOG 0
 #define CMP_LOG 1
 
-#define D 4096
+#define D 16
 #define VL 8
 
 void debug_rope(float Token[][VL], float *New_Token_baseline, float *New_Token);
